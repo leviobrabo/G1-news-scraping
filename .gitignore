@@ -1,0 +1,18 @@
+# Arquivos de byte compilados Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Arquivos de log e dados
+*.log
+*.csv
+*.json
+
+# Arquivos gerados ao executar o projeto
+*.db
+*.sqlite3
+*.xlsx
