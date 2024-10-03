@@ -6,6 +6,7 @@ __pycache__/
 venv/
 env/
 ENV/
+.venv/
 
 # Arquivos de log e dados
 *.log

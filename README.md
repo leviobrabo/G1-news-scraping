@@ -10,6 +10,12 @@ O objetivo principal deste projeto é fornecer uma ferramenta de scraping para c
 
 Para utilizar este projeto, siga os passos abaixo:
 
+### Crie e acesse um ambiente virtual
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
 ### Instalação das Dependências:
 
 Certifique-se de ter o Python instalado em seu ambiente. Este projeto foi desenvolvido usando Python 3.x.
@@ -25,7 +31,7 @@ pip3 install -r requirements.txt
 Após a instalação das dependências, você pode executar o arquivo `scrapper.py` para iniciar o scraping das notícias.
 
 ```bash
-python3 scrapper.py
+python3 G1-News/scraper.py
 ```
 
 ### Resultado:
