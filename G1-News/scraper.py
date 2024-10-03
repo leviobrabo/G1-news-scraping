@@ -1,10 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
+import time
+from rich.console import Console
+from rich.live import Live
+from rich.table import Table
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-
 
 def get_news(limit=5):
     logger.info('Obtendo notícias...')
@@ -34,50 +37,17 @@ def get_news(limit=5):
                 link_element = section.find('a', {'class': 'feed-post-link'})
                 image_element = section.find('img', {'class': 'bstn-fd-picture-image'})
 
-                if link_element:
-                    link_response = requests.get(link_element['href'], timeout=10, headers=headers)
-                else:
-                    logger.warning('Link não encontrado')
-                    continue
-
-                link_content = BeautifulSoup(link_response.content, 'html.parser')
-
-                full_text_content = link_content.find_all('div', {'class': 'mc-column content-text active-extra-styles'})
-                media_content = link_content.find_all('div', {'class': 'mc-column content-media__container'})
-
-                full_text = ''
-                media_links = []
-                for text_section in full_text_content:
-                    text = text_section.get_text(strip=True)
-                    if text:
-                        full_text += text + '\n\n'
-
-                for media_section in media_content:
-                    media_element = media_section.find('img')
-                    if media_element and 'src' in media_element.attrs:
-                        media_links.append(media_element['src'])
-                        full_text += f'<img src="{media_element["src"]}">\n\n'
-
-                autor_element = link_content.find('p', {'class': 'content-publication-data__from'})
-
                 if title_element and link_element and description_element and image_element:
                     title = title_element.text.strip()
                     link = link_element['href']
                     description = description_element.text.strip()
                     image_url = image_element['src']
 
-                    if autor_element:
-                        autor = autor_element.text
-                    else:
-                        autor = None
-
                     news_list.append({
                         'title': title,
                         'description': description,
                         'link': link,
                         'image': image_url,
-                        'autor': autor,
-                        'full_text': full_text,
                     })
 
                     if len(news_list) >= limit:
@@ -97,8 +67,31 @@ def get_news(limit=5):
         logger.exception(f'Erro ao obter notícias: {str(e)}')
         return news_list
 
+def display_news(news):
+    table = Table(title="Notícias")
+
+    table.add_column("Título", style="bold", width=50)
+    table.add_column("Descrição", width=100)
+
+    for article in news:
+        table.add_row(article['title'], article['description'] + '\n')
+        table.add_row('-----------------------')
+
+    return table
 
 if __name__ == "__main__":
-    news = get_news(limit=5)
-    for idx, article in enumerate(news, start=1):
-        print(f"Notícia {idx}: {article['title']}")
+    while True:
+        console = Console()
+        news = get_news(limit=50)
+        news_to_display = []
+
+        with Live(display_news(news_to_display), console=console, refresh_per_second=1) as live:
+            for idx, article in enumerate(news, start=1):
+                news_to_display.append(article)
+                live.update(display_news(news_to_display))  # Atualiza a tabela com nova notícia
+                time.sleep(10)  # Espera 10 segundos antes de adicionar outra notícia
+                # LIMPA EM MULTIPLOS DE 5
+                if len(news_to_display) % 5 == 0:
+                    console.clear()
+        # 10 Minutos
+        time.sleep(600)
