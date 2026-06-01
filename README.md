@@ -1,64 +1,100 @@
-﻿# G1 News Scraping
+# G1 News Scraping
 
-Este é um projeto simples de web scraping desenvolvido em Python para extrair as últimas notícias do site G1 (globo.com). Ele utiliza as bibliotecas requests e BeautifulSoup para coletar informações das páginas web.
+Ferramenta de web scraping em Python para coletar as últimas notícias do portal G1 (globo.com). Exibe os resultados no terminal com formatação rica e permite exportar para JSON ou CSV.
 
-## Objetivo
+## Funcionalidades
 
-O objetivo principal deste projeto é fornecer uma ferramenta de scraping para coletar notícias do G1 de maneira automatizada. Esse código pode ser usado como base para projetos mais avançados ou para entender os conceitos básicos de scraping.
+- Coleta notícias da página de últimas notícias do G1
+- Exibe tabela formatada no terminal via `rich`
+- Exportação para **JSON** ou **CSV**
+- Modo ao vivo (`--live`) com atualização automática a cada 10 minutos
+- Controle do número de notícias via argumento `-n`
 
-## Como Usar
+## Requisitos
 
-Para utilizar este projeto, siga os passos abaixo:
+- Python 3.8+
+- Dependências listadas em `requirements.txt`
 
-### Crie e acesse um ambiente virtual
+## Instalação
+
 ```bash
+# Crie e ative um ambiente virtual
 python -m venv .venv
+
+# Linux / macOS
 source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+# Instale as dependências
+pip install -r requirements.txt
 ```
 
-### Instalação das Dependências:
+## Uso
 
-Certifique-se de ter o Python instalado em seu ambiente. Este projeto foi desenvolvido usando Python 3.x.
-
-Utilize o comando abaixo para instalar as dependências necessárias:
+### Via `main.py` (entrada principal)
 
 ```bash
-pip3 install -r requirements.txt
+# 5 notícias (padrão)
+python G1-News/main.py
+
+# 20 notícias
+python G1-News/main.py -n 20
+
+# Exportar para JSON
+python G1-News/main.py -n 10 --export json
+
+# Exportar para CSV com caminho personalizado
+python G1-News/main.py -n 15 --export csv --output saida/noticias.csv
 ```
 
-### Execução do Scraping:
-
-Após a instalação das dependências, você pode executar o arquivo `scrapper.py` para iniciar o scraping das notícias.
+### Via `scraper.py` (com modo ao vivo)
 
 ```bash
-python3 G1-News/scraper.py
+# Exibição única
+python G1-News/scraper.py -n 10
+
+# Modo ao vivo — atualiza a cada 10 minutos
+python G1-News/scraper.py --live -n 20
+
+# Exportar JSON
+python G1-News/scraper.py -n 10 --export json --output noticias.json
 ```
 
-### Resultado:
+### Argumentos disponíveis
 
-O código irá coletar as últimas notícias do G1, exibindo os títulos das notícias obtidas no console.
+| Argumento         | Padrão          | Descrição                                   |
+|-------------------|-----------------|---------------------------------------------|
+| `-n`, `--limit`   | `5` / `10`      | Quantidade de notícias a coletar            |
+| `--export`        | —               | Formato de exportação: `json` ou `csv`      |
+| `--output`        | `noticias.json` | Caminho do arquivo de saída                 |
+| `--live`          | —               | Modo ao vivo (somente `scraper.py`)         |
 
-## Estrutura de Pasta
+## Estrutura do Projeto
 
-A estrutura de pastas do projeto está organizada da seguinte maneira:
-
-```bash
-G1_News_Scraper/
-│
-├── src/
-│ ├── main.py # Arquivo principal onde você inicia o web scraping
-│ └── scraper.py # Arquivo onde a função de scraping (get_news) está definida
-│
-├── requirements.txt # Arquivo que lista todas as dependências do projeto
-└── README.md # Este arquivo, contendo informações sobre o projeto e instruções de uso
+```
+G1-news-scraping/
+├── G1-News/
+│   ├── main.py        # Entrada principal com CLI
+│   └── scraper.py     # Lógica de scraping, exportação e modo ao vivo
+├── requirements.txt   # Dependências do projeto
+└── README.md          # Documentação
 ```
 
--   `src/`: Pasta que contém o código fonte do projeto.
--   `requirements.txt`: Lista todas as dependências do projeto para facilitar a instalação.
--   `README.md`: Documentação explicando o projeto, instruções de uso e informações gerais.
+## Dados Coletados
 
-## Avisos Importantes
+Cada notícia retorna um dicionário com os seguintes campos:
 
--   **Uso Responsável:** Este projeto foi desenvolvido para fins educacionais e de aprendizado. Sempre respeite os termos de serviço dos sites ao realizar web scraping.
+| Campo         | Descrição                         |
+|---------------|-----------------------------------|
+| `title`       | Título da notícia                 |
+| `description` | Resumo do conteúdo                |
+| `link`        | URL completa para a notícia       |
+| `image`       | URL da imagem de capa             |
 
--   **Limitações e Restrições:** O scraping de sites pode ser contra os termos de serviço de alguns sites. Verifique as políticas de uso e os limites de solicitação do site alvo antes de executar o código.
+## Avisos
+
+- **Uso responsável:** projeto desenvolvido para fins educacionais. Respeite os termos de serviço do G1.
+- **Dependência de estrutura HTML:** scrapers são sensíveis a mudanças no layout do site. Se parar de funcionar, a estrutura HTML do G1 pode ter sido alterada.
+- **Rate limiting:** o modo ao vivo aguarda 10 minutos entre cada ciclo para não sobrecarregar o servidor.
